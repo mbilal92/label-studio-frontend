@@ -10,6 +10,8 @@ import User from "./UserStore";
 import Utils from "../utils";
 import { delay } from "../utils/utilities";
 import messages from "../utils/messages";
+import UserRank from "./UserRank";
+import AnswerResponseMessage from "./AnswerResponseMessage";
 
 export default types
   .model("AppStore", {
@@ -44,6 +46,15 @@ export default types
     }),
 
     /**
+     * UserRanks for leaderboard
+     */
+    userRanks: types.optional(types.array(UserRank), []),
+
+    /**
+     * Answer Response
+     */
+    answerResponse: types.maybeNull(AnswerResponseMessage),
+    /**
      * User of Label Studio
      */
     user: types.maybeNull(User),
@@ -72,7 +83,7 @@ export default types
      * Flag
      * Description of task in Label Studio
      */
-    showingDescription: types.optional(types.boolean, false),
+    showingDescription: types.optional(types.boolean, true),
     /**
      * Loading of Label Studio
      */
@@ -345,7 +356,7 @@ export default types
      * Function to initilaze completion store
      * Given completions and predictions
      */
-    function initializeStore({ completions, predictions }) {
+    function initializeStore({ completions, predictions, userranks, taskAnswerResponse }) {
       const cs = self.completionStore;
       cs.initRoot(self.config);
 
@@ -363,6 +374,32 @@ export default types
         obj.reinitHistory();
       });
       /* eslint-enable no-unused-expressions */
+      if (userranks != undefined) {
+        userranks.forEach(uR => {
+          let userank = UserRank.create({ rank: uR.rank, UserName: uR.UserName });
+          self.userRanks.unshift(userank);
+        });
+      }
+      // self.answerResponse = AnswerResponseMessage.create({type:2, message:"Answer is correct"});
+      if (taskAnswerResponse != undefined) {
+        self.answerResponse = AnswerResponseMessage.create({
+          type: taskAnswerResponse.type,
+          message: taskAnswerResponse.message,
+        });
+      }
+    }
+
+    function updateDescription(_description) {
+      self.description = _description;
+    }
+
+    function addUserRanks(userranks) {
+      if (userranks != undefined) {
+        userranks.forEach(uR => {
+          let userank = UserRank.create({ rank: uR.rank, UserName: uR.UserName });
+          self.userRanks.unshift(userank);
+        });
+      }
     }
 
     return {
@@ -384,5 +421,8 @@ export default types
       showModal,
       toggleSettings,
       toggleDescription,
+
+      addUserRanks,
+      updateDescription,
     };
   });

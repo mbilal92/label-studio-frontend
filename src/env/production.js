@@ -15,10 +15,14 @@ function getData(task) {
 function getState(task) {
   const completions = task && task.completions ? task.completions : null;
   const predictions = task && task.predictions ? task.predictions : null;
+  const userranks = task && task.userranks ? task.userranks : null;
+  const taskAnswerResponse = task && task.taskAnswerResponse ? task.taskAnswerResponse : null;
 
   return {
     completions: completions,
     predictions: predictions,
+    userranks: userranks,
+    taskAnswerResponse: taskAnswerResponse,
   };
 }
 

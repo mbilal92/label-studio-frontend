@@ -5,7 +5,9 @@ import React, { Component } from "react";
 import { Result, Spin } from "antd";
 import { getEnv } from "mobx-state-tree";
 import { observer, Provider } from "mobx-react";
-
+//import Tour from "reactour";
+// import JoyRide from 'react-joyride';
+import MyTour from "../MyTour/MyTour";
 /**
  * Core
  */
@@ -23,7 +25,8 @@ import Segment from "../Segment/Segment";
 import Settings from "../Settings/Settings";
 import SideColumn from "../SideColumn/SideColumn";
 import { RelationsOverlay } from "../RelationsOverlay/RelationsOverlay";
-
+import LeaderBoards from "../LeaderBoard/LeaderBoard";
+import Messages from "../Message/Message";
 /**
  * Tags
  */
@@ -90,6 +93,11 @@ class App extends Component {
       <>
         {!cs.viewingAllCompletions && !cs.viewingAllPredictions && (
           <Segment completion={cs.selected} className={settings.bottomSidePanel ? "" : styles.segment + " ls-segment"}>
+            {store.showingDescription && store.description && (
+              <Segment className={styles.ls_description_bgcolor}>
+                <div dangerouslySetInnerHTML={{ __html: store.description }} />
+              </Segment>
+            )}
             <div style={{ position: "relative" }}>
               {Tree.renderItem(root)}
               {this.renderRelations(cs.selected)}
@@ -145,11 +153,11 @@ class App extends Component {
           <div>
             {store.hasInterface("panel") && <Panel store={store} />}
 
-            {store.showingDescription && (
-              <Segment>
-                <div dangerouslySetInnerHTML={{ __html: store.description }} />
-              </Segment>
-            )}
+            {/* {store.showingDescription &&  store.description &&(
+                  <Segment>
+                    <div dangerouslySetInnerHTML={{ __html: store.description }} />
+                  </Segment>
+              )} */}
 
             {/* <div className={styles.pins}> */}
             {/*   <div style={{ width: "100%", marginRight: "20px" }}><PushpinOutlined /></div> */}
@@ -161,6 +169,7 @@ class App extends Component {
                 ? this._renderUI(root, store, cs, settings)
                 : this.renderConfigValidationException()}
               <div className={stMenu + " ls-menu"}>
+                {store.hasInterface("messages") && <Messages store={store} />}
                 {store.hasInterface("completions:menu") && store.settings.showCompletionsPanel && (
                   <Completions store={store} />
                 )}
@@ -170,11 +179,20 @@ class App extends Component {
                 {store.hasInterface("side-column") && !cs.viewingAllCompletions && !cs.viewingAllPredictions && (
                   <SideColumn store={store} />
                 )}
+                {store.hasInterface("leaderboad") && <LeaderBoards store={store} />}
               </div>
             </div>
           </div>
         </Provider>
         {store.hasInterface("debug") && <Debug store={store} />}
+        <MyTour />
+        {/* <MyTour />
+        <JoyRide steps={TOUR_STEPS} continuous={true}/> */}
+        {/* <Tour
+        steps={steps}
+        isOpen='false'//{isTourOpen}
+        //onRequestClose={}//onRequestClose={() => setIsTourOpen(false)}
+      /> */}
       </div>
     );
   }
